@@ -9,11 +9,10 @@ Time Frecuency Representations
 
 import mne
 import numpy as np
-
-from mne.time_frequency import tfr_multitaper, tfr_morlet
-from Data_extractions   import Extract_block_data_from_subject, Extract_data_from_subject
-from Data_processing    import Filter_by_condition, Filter_by_class
-from Utilitys           import Ensure_dir, unify_names
+from mne.time_frequency                 import tfr_multitaper, tfr_morlet
+from Python_Processing.Data_extractions import Extract_block_data_from_subject, Extract_data_from_subject
+from Python_Processing.Data_processing  import Filter_by_condition, Filter_by_class
+from Python_Processing.Utilitys         import Ensure_dir, unify_names
 
 
 # In[]: Processing Variables

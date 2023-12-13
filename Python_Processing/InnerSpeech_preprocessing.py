@@ -18,12 +18,12 @@ import mne
 import pickle
 import numpy as np
 
-from Events_analysis    import Event_correction, Add_condition_tag, Add_block_tag, Delete_trigger
-from Events_analysis    import Cognitive_control_check, Standarized_labels, Check_Baseline_tags
-from Data_extractions   import Extract_subject_from_BDF
-from Utilitys           import Ensure_dir
-from AdHoc_modification import adhoc_Subject_3
-from EMG_Control        import EMG_control_single_th
+from Python_Processing.Events_analysis    import Event_correction, Add_condition_tag, Add_block_tag, Delete_trigger
+from Python_Processing.Events_analysis    import Cognitive_control_check, Standarized_labels, Check_Baseline_tags
+from Python_Processing.Data_extractions   import Extract_subject_from_BDF
+from Python_Processing.Utilitys           import Ensure_dir
+from Python_Processing.AdHoc_modification import adhoc_Subject_3
+from Python_Processing.EMG_Control        import EMG_control_single_th
 
 # In[]: Processing Variables
 

@@ -10,7 +10,7 @@ Utilitys from extract, read and load data from Inner Speech Dataset
 import mne
 import gc
 import numpy as np
-from Inner_Speech_Dataset.Python_Processing.Utilitys import sub_name , unify_names
+from Python_Processing.Utilitys import sub_name, unify_names
 import pickle
 def Extract_subject_from_BDF(root_dir,N_S,N_B):
 
@@ -52,18 +52,17 @@ def Extract_data_from_subject(root_dir,N_S,datatype):
             data[N_B]= X._data
         
         elif datatype=="baseline":
+            # NOTE: When loading baseline .fif file, it returns an (1, 137, 3841) array instead of
+            #       (1, 136, 3841) as mentioned in the paper (136 = 128+8). The last row seems to be
+            #       an error in the .fif file. We discard it.
             file_name = root_dir + '/derivatives/' + Num_s + '/ses-0'+ str(N_B) + '/' +Num_s+'_ses-0'+str(N_B)+'_baseline-epo.fif'
             X= mne.read_epochs(file_name,verbose='WARNING')
-            data[N_B]= X._data
-
+            data[N_B]= X._data[:, :-1, :]
         else:
             raise Exception("Invalid Datatype")
          
-    X = np.vstack((data.get(1),data.get(2),data.get(3))) 
-    
-    
-    Y = np.vstack((y.get(1),y.get(2),y.get(3))) 
-    
+    X = np.vstack((data.get(1),data.get(2),data.get(3)))
+    Y = np.vstack((y.get(1),y.get(2),y.get(3)))
 
     return X, Y
 
@@ -72,29 +71,31 @@ def Extract_block_data_from_subject(root_dir,N_S,datatype,N_B):
     Load selected block from one subject
     """
 
-
     # Get subject name
     Num_s = sub_name(N_S)
-        
+    datatype = datatype.lower()
+
     # Get events
     Y = load_events(root_dir,N_S,N_B)
     
     sub_dir = root_dir + '/derivatives/' + Num_s + '/ses-0'+ str(N_B) + '/' +Num_s+'_ses-0'+str(N_B)
     if datatype == "eeg":
-        #  load EEG data 
         file_name = sub_dir + '_eeg-epo.fif'
         X = mne.read_epochs(file_name,verbose='WARNING')
+        X = X._data
 
     elif datatype=="exg":
-        #  load EXG data 
         file_name = sub_dir + '_exg-epo.fif'
         X = mne.read_epochs(file_name,verbose='WARNING')
-    
+        X = X._data
+
     elif datatype=="baseline":
-        #  load Baseline data 
+        # NOTE: When loading baseline .fif file, it returns an (1, 137, 3841) array instead of
+        #       (1, 136, 3841) as mentioned in the paper (136 = 128+8). The last row seems to be
+        #       an error in the .fif file. We discard it.
         file_name = sub_dir + '_baseline-epo.fif'
-        X = mne.read_epochs(file_name,verbose='WARNING')
-    
+        X = mne.read_epochs(file_name, verbose='WARNING')
+        X = X._data[:, :-1, :]
     else:
         raise Exception("Invalid Datatype")
      
@@ -225,5 +226,3 @@ def load_events(root_dir,N_S,N_B):
     
     return events
 
-
-    

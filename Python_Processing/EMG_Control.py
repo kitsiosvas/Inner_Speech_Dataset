@@ -57,8 +57,8 @@ def EMG_control_single_th(root_dir,N_Subj_arr,N_block_arr,low_f,high_f,t_min,t_m
     # Imports
     import numpy as np
     import pickle
-    from Data_processing import  Calculate_power_windowed
-    from Data_extractions import  Extract_block_data_from_subject, Extract_report
+    from Python_Processing.Data_processing import Calculate_power_windowed
+    from Python_Processing.Data_extractions import Extract_block_data_from_subject, Extract_report
 
     # Trials of Pronounced condition are excluded in the EMG control
     Pronunced_id=0
