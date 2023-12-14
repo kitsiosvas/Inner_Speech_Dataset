@@ -4,7 +4,7 @@ from Python_Processing.Data_extractions import Extract_data_from_subject, Extrac
 # Hyper parameters
 
 # The root dir have to point to the folder that contains the database
-root_dir = "..\\Dataset\\"
+root_dir = "../Dataset/"
 
 # Data Type {eeg, exg, baseline}
 datatype = "eeg"

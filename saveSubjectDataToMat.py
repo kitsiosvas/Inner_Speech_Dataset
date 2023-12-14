@@ -9,7 +9,7 @@ import os
 # Hyper parameters
 
 # The root dir have to point to the folder that contains the database
-root_dir = "..\\Dataset\\"
+root_dir = "../Dataset/"
 
 # Data Type {eeg, exg, baseline}
 datatype = "EEG"
