@@ -19,7 +19,7 @@ from Python_Processing.Utilitys import Ensure_dir, picks_from_channels
 # In[] Imports modules
 
 # Root where the data are stored
-root_dir = "../"
+root_dir = "../../../Dataset/"
 
 save_dir = "../"
 
@@ -32,7 +32,7 @@ Condition_list = ["Inner", "Vis"]
 Classes_list = ["All"]
 channel = "A26"
 # Get picks for the selected channels
-picks = picks_from_channels(channel)
+#picks = picks_from_channels(channel)
 picks = ["A26"]
 
 save_bool = True
@@ -64,13 +64,12 @@ colors = ["darkred", "midnightblue"]  # "midnightblue" - "darkred" - "darkcyan" 
 N_B = 1
 N_S = 1
 # Load a single subject to use the Epoched Object structure
-X_S, Y = Extract_block_data_from_subject(root_dir, N_S, datatype, N_B=N_B)
+X_S, Y = Extract_block_data_from_subject(root_dir, N_S, datatype, N_B)
 
 Adquisition_eq = "biosemi128"
 montage = mne.channels.make_standard_montage(Adquisition_eq)
 X_S.set_montage(montage)
 
-# In[]: Load Data
 fig = plt.figure(figsize=[13, 10])
 axs = plt.axes()
 n_plot = 0
@@ -108,8 +107,6 @@ for Classes in Classes_list:
         fig = X_S.plot_psd(average=True, dB=True, estimate="power", bandwidth=bandwidth,
                            color=color, picks=picks, fmin=fmin,
                            fmax=fmax, tmin=tmin, tmax=tmax, ax=axs, )
-
-# In[]: Saving
 
 
 axs.legend(["Inner Speech", "Visualized"], loc='upper right', borderaxespad=0.9, fontsize=fontsize, shadow=False)
