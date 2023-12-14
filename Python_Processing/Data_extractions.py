@@ -103,7 +103,6 @@ def Extract_block_data_from_subject(root_dir,N_S,datatype,N_B):
 
 def Extract_report(root_dir,N_B,N_S):
 
-
     # Get subject name
     Num_s = sub_name(N_S)
         

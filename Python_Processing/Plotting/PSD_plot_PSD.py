@@ -12,9 +12,9 @@ import mne
 import numpy as np
 import matplotlib.pyplot as plt
 
-from Data_extractions import Extract_block_data_from_subject, Extract_data_from_subject
-from Data_processing import Filter_by_condition, Filter_by_class
-from Utilitys import Ensure_dir, picks_from_channels
+from Python_Processing.Data_extractions import Extract_block_data_from_subject, Extract_data_from_subject
+from Python_Processing.Data_processing import Filter_by_condition, Filter_by_class
+from Python_Processing.Utilitys import Ensure_dir, picks_from_channels
 
 # In[] Imports modules
 

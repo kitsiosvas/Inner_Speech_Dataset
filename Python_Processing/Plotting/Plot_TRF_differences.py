@@ -10,8 +10,8 @@ Plot power difference between two clases or conditions.
 import matplotlib.pyplot as plt
 import numpy as np
 
-from Utilitys         import Ensure_dir
-from Data_extractions import Extract_TFR
+from Python_Processing.Utilitys         import Ensure_dir
+from Python_Processing.Data_extractions import Extract_TFR
 
 # In[] Imports modules
 
