@@ -7,8 +7,8 @@ Created on Thu Aug  6 11:53:54 2020
 
 Ad hoc correction subject 3:
     
-    Subject S03 inform in block 1 he did not realice the inner speech paradigm. 
-    Instaed he perform the visualized paradigm.
+    Subject S03 inform in block 1 he did not realise the inner speech paradigm.
+    Instead, he performs the visualized paradigm.
 """
 
 def adhoc_Subject_3 (root_dir,verbose=True):
