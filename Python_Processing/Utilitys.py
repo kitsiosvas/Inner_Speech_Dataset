@@ -7,6 +7,7 @@
 Utilitys for Inner speech dataset prossesing
 """
 
+
 def Ensure_dir(dir_name):
     import os
     if not os.path.exists(dir_name):
@@ -99,6 +100,7 @@ def unify_names(Cond, Class):
         
     return Cond, Class
 
+
 def map_condition(cnd):
     if not cnd:
         raise Exception("Condition is empty!")
@@ -113,6 +115,7 @@ def map_condition(cnd):
         return "VISUALIZED"
 
     raise Exception("Wrong name of condition!")
+
 
 def map_class(cl):
     if not cl:
@@ -132,11 +135,9 @@ def map_class(cl):
     raise Exception("Wrong name of class!")    
 
 
-def sub_name(N_S):
-    # Standarize subjects name
-    if N_S < 10:
-        Num_s = 'sub-0'+str(N_S)
+def getFullNameFromSbjNumber(sbjNumber):
+    if sbjNumber < 10:
+        sbjName = 'sub-0'+str(sbjNumber)
     else:
-        Num_s = 'sub-'+str(N_S)
-        
-    return Num_s
+        sbjName = 'sub-'+str(sbjNumber)
+    return sbjName

@@ -1,4 +1,5 @@
 from scipy.io import savemat
+from config import Config
 from Python_Processing.Data_extractions import Extract_data_from_subject
 import os
 
@@ -24,9 +25,9 @@ N_S = 1   # [1 to 10]
 X, Y = Extract_data_from_subject(root_dir, N_S, datatype)
 
 # Keep only trials for inner speech (see https://www.nature.com/articles/s41597-022-01147-2 Table 5)
-idxInnerSpeechTrials = (Y[:, 2] == 1)
+idxInnerSpeechTrials = (Y[:, Config.conditionColumn] == Config.idInnerCondition)
 # Keep only essential columns
-columnsToKeep = [1, 3]  # Class(left, right, up, down) and session number(1, 2 or 3) column
+columnsToKeep = [Config.classColumn, Config.sessionColumn]
 
 X = X[idxInnerSpeechTrials]
 Y = Y[idxInnerSpeechTrials]
@@ -35,7 +36,6 @@ Y = Y[:, columnsToKeep]
 # Load baseline data
 datatype = "baseline"
 xBaseline, yBaseline = Extract_data_from_subject(root_dir, N_S, datatype)
-
 
 data_dict = {
     'X': X,

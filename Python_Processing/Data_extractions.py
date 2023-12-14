@@ -6,64 +6,48 @@
 
 Utilitys from extract, read and load data from Inner Speech Dataset
 """
-
+from config import Config
 import mne
 import gc
 import numpy as np
-from Python_Processing.Utilitys import sub_name, unify_names
+from Python_Processing.Utilitys import getFullNameFromSbjNumber, unify_names
 import pickle
 
 
-def Extract_subject_from_BDF(root_dir, N_S, N_B):
+def Extract_subject_from_BDF(root_dir, sbjNumber, sessionNumber):
     # name correction if N_Subj is less than 10
-    Num_s = sub_name(N_S)
+    Num_s = getFullNameFromSbjNumber(sbjNumber)
 
     #  load data
-    file_name = root_dir + '/' + Num_s + '/ses-0' + str(N_B) + '/eeg/' + Num_s + '_ses-0' + str(
-        N_B) + '_task-innerspeech_eeg.bdf'
+    file_name = root_dir + '/' + Num_s + '/ses-0' + str(sessionNumber) + '/eeg/' + Num_s + '_ses-0' + str(sessionNumber) + '_task-innerspeech_eeg.bdf'
     rawdata = mne.io.read_raw_bdf(input_fname=file_name, preload=True, verbose='WARNING')
     return rawdata, Num_s
 
 
-def Extract_data_from_subject(root_dir, N_S, datatype):
+def Extract_data_from_subject(root_dir, sbjNumber, datatype):
     """
     Load all blocks for one subject and stack the results in X
     """
 
-    data = dict()
-    y = dict()
-    N_B_arr = [1, 2, 3]
+    # name correction if sbjNumber is less than 10
+    sbjName = getFullNameFromSbjNumber(sbjNumber)
+    data    = dict()
+    y       = dict()
     datatype = datatype.lower()
 
-    for N_B in N_B_arr:
-        # name correction if N_Subj is less than 10
-        Num_s = sub_name(N_S)
+    fileSuffix = Config.getFileSuffixFromShort(datatype)
 
-        y[N_B] = load_events(root_dir, N_S, N_B)
+    for thisSession in Config.sessionsList:
 
-        if datatype == "eeg":
-            #  load data and events
-            file_name = root_dir + '/derivatives/' + Num_s + '/ses-0' + str(N_B) + '/' + Num_s + '_ses-0' + str(
-                N_B) + '_eeg-epo.fif'
-            X = mne.read_epochs(file_name, verbose='WARNING')
-            data[N_B] = X._data
-
-        elif datatype == "exg":
-            file_name = root_dir + '/derivatives/' + Num_s + '/ses-0' + str(N_B) + '/' + Num_s + '_ses-0' + str(
-                N_B) + '_exg-epo.fif'
-            X = mne.read_epochs(file_name, verbose='WARNING')
-            data[N_B] = X._data
-
-        elif datatype == "baseline":
+        y[thisSession] = load_events(root_dir, sbjNumber, thisSession)
+        file_name = root_dir + '/derivatives/' + sbjName + '/ses-0' + str(thisSession) + '/' + sbjName + '_ses-0' + str(thisSession) + fileSuffix
+        X = mne.read_epochs(file_name, verbose='WARNING')
+        data[thisSession] = X.get_data(copy=True)
+        if datatype == "baseline":
             # NOTE: When loading baseline .fif file, it returns an (1, 137, 3841) array instead of
             #       (1, 136, 3841) as mentioned in the paper (136 = 128+8). The last row seems to be
             #       an error in the .fif file. We discard it.
-            file_name = root_dir + '/derivatives/' + Num_s + '/ses-0' + str(N_B) + '/' + Num_s + '_ses-0' + str(
-                N_B) + '_baseline-epo.fif'
-            X = mne.read_epochs(file_name, verbose='WARNING')
-            data[N_B] = X._data[:, :-1, :]
-        else:
-            raise Exception("Invalid Datatype")
+            data[thisSession] = data[thisSession][:, :-1, :]
 
     X = np.vstack((data.get(1), data.get(2), data.get(3)))
     Y = np.vstack((y.get(1), y.get(2), y.get(3)))
@@ -77,7 +61,7 @@ def Extract_block_data_from_subject(root_dir, N_S, datatype, N_B):
     """
 
     # Get subject name
-    Num_s = sub_name(N_S)
+    Num_s = getFullNameFromSbjNumber(N_S)
     datatype = datatype.lower()
 
     # Get events
@@ -109,11 +93,11 @@ def Extract_block_data_from_subject(root_dir, N_S, datatype, N_B):
 
 def Extract_report(root_dir, N_B, N_S):
     # Get subject name
-    Num_s = sub_name(N_S)
+    Num_s = getFullNameFromSbjNumber(N_S)
 
     # Save report
     sub_dir = root_dir + '/derivatives/' + Num_s + '/ses-0' + str(N_B) + '/' + Num_s + '_ses-0' + str(N_B)
-    file_name = sub_dir + '_report.pkl'
+    file_name = sub_dir + Config.fileSuffixReport
 
     with open(file_name, 'rb') as input:
         report = pickle.load(input)
@@ -137,7 +121,6 @@ def Extract_data_multisubject(root_dir, N_S_list, datatype='EEG'):
     Load all blocks for a list of subject and stack the results in X
     """
 
-    N_B_arr = [1, 2, 3]
     tmp_list_X = []
     tmp_list_Y = []
     rows = []
@@ -147,9 +130,9 @@ def Extract_data_multisubject(root_dir, N_S_list, datatype='EEG'):
     for N_S in N_S_list:
         print("Iteration ", S)
         print("Subject ", N_S)
-        for N_B in N_B_arr:
+        for N_B in Config.sessionsList:
 
-            Num_s = sub_name(N_S)
+            Num_s = getFullNameFromSbjNumber(N_S)
 
             base_file_name = root_dir + '/derivatives/' + Num_s + '/ses-0' + str(N_B) + '/' + Num_s + '_ses-0' + str(
                 N_B)
@@ -218,11 +201,11 @@ def Extract_data_multisubject(root_dir, N_S_list, datatype='EEG'):
         return X
 
 
-def load_events(root_dir, N_S, N_B):
-    Num_s = sub_name(N_S)
+def load_events(root_dir, sbjNumber, sessionNumber):
+    Num_s = getFullNameFromSbjNumber(sbjNumber)
     # Create file Name
-    file_name = root_dir + "/derivatives/" + Num_s + "/ses-0" + str(N_B) + "/" + Num_s + "_ses-0" + str(
-        N_B) + "_events.dat"
+    file_name = root_dir + "/derivatives/" + Num_s + "/ses-0" + str(sessionNumber) + "/" + Num_s + "_ses-0" + str(
+        sessionNumber) + Config.fileSuffixEvents
     # Load Events
     events = np.load(file_name, allow_pickle=True)
 
