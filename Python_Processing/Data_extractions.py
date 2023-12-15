@@ -46,8 +46,8 @@ def Extract_data_from_subject(root_dir, sbjNumber, datatype):
         if datatype == "baseline":
             # NOTE: When loading baseline .fif file, it returns an (1, 137, 3841) array instead of
             #       (1, 136, 3841) as mentioned in the paper (136 = 128+8). The last row seems to be
-            #       an error in the .fif file. We discard it.
-            data[thisSession] = data[thisSession][:, :-1, :]
+            #       an error in the .fif file. We discard it. Also discard EXG data (last 8 rows)
+            data[thisSession] = data[thisSession][:, :-9, :]
 
     X = np.vstack((data.get(1), data.get(2), data.get(3)))
     Y = np.vstack((y.get(1), y.get(2), y.get(3)))
@@ -71,12 +71,12 @@ def Extract_block_data_from_subject(root_dir, N_S, datatype, N_B):
     if datatype == "eeg":
         file_name = sub_dir + '_eeg-epo.fif'
         X = mne.read_epochs(file_name, verbose='WARNING')
-        X = X._data
+        #X = X._data
 
     elif datatype == "exg":
         file_name = sub_dir + '_exg-epo.fif'
         X = mne.read_epochs(file_name, verbose='WARNING')
-        X = X._data
+        #X = X._data
 
     elif datatype == "baseline":
         # NOTE: When loading baseline .fif file, it returns an (1, 137, 3841) array instead of
@@ -84,7 +84,7 @@ def Extract_block_data_from_subject(root_dir, N_S, datatype, N_B):
         #       an error in the .fif file. We discard it.
         file_name = sub_dir + '_baseline-epo.fif'
         X = mne.read_epochs(file_name, verbose='WARNING')
-        X = X._data[:, :-1, :]
+        #X = X._data[:, :-1, :]
     else:
         raise Exception("Invalid Datatype")
 
