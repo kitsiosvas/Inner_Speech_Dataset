@@ -16,7 +16,7 @@ root_dir = "../Dataset/"
 datatype = "EEG"
 
 # Sampling rate
-fs = 256
+fs = 256.0
 
 # Subject number
 N_S = 1   # [1 to 10]
