@@ -10,13 +10,14 @@ import mne
 import numpy as np
 import matplotlib.pyplot as plt
 
+import config
 from Python_Processing.Data_extractions import Extract_block_data_from_subject, Extract_data_from_subject
 from Python_Processing.Data_processing import Filter_by_condition, Filter_by_class
 from Python_Processing.Utilitys import Ensure_dir, picks_from_channels
 
 # Root where the data are stored
-root_dir = "../"
-save_dir = "/media/nnieto/50e793fa-4717-4997-b590-b4167be63ee7/home/nnieto/Escritorio/Nico/Doctorado/Tesis/LIAA - sinc(i)/Toma de datos/Analisis/ERPs/Dataset final/ERPs/"
+root_dir = "../../../Dataset/"
+save_dir = "../"
 
 # Subjects
 N_S_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
@@ -28,7 +29,7 @@ Classes_list = ["All"]
 channels = "all"
 
 # Saving Parameters
-save_bool = True
+save_bool = False
 prefix = "ERPs"
 
 # Fix all random states
@@ -66,7 +67,7 @@ n_test = 1
 for Classes in Classes_list:
     for Cond in Condition_list:
         count = 1
-        for N_S in N_S_list:
+        for N_S in range(1,2):
 
             # Load full subject's data
             X, Y = Extract_data_from_subject(root_dir, N_S, datatype)
