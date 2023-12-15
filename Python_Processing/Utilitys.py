@@ -158,3 +158,17 @@ def filterCondition(X, Y, conditionID, discardNonEssentialCols=True):
 
     return X, Y
 
+
+def selectElectrodes(X, electrodes):
+    electrode_mapping = {
+        f"{letter}{number}": index
+        for index, (letter, number) in enumerate([(letter, str(number)) for letter in "ABCD" for number in range(1, 33)])
+    }
+
+    # Get the indices corresponding to the electrode names
+    selected_indices = [electrode_mapping[electrode] for electrode in electrodes]
+
+    # Select the corresponding rows from the data array
+    selected_data = X[:, selected_indices, :]
+
+    return selected_data
