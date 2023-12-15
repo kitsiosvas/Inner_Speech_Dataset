@@ -44,7 +44,7 @@ def Calculate_power_windowed(signal_data, fc, window_len, window_step, t_min, t_
     return m_power, std_power
 
 
-def Select_time_window(X, t_start=1, t_end=2.5, fs=256):
+def Select_time_window(X, t_start=1, t_end=3.5, fs=256):
     t_max = X.shape[2]
     start = max(round(t_start * fs), 0)
     end = min(round(t_end * fs), t_max)
