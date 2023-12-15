@@ -44,7 +44,6 @@ def Calculate_power_windowed(signal_data, fc, window_len, window_step, t_min, t_
     return m_power, std_power
 
 
-# In[]
 def Select_time_window(X, t_start=1, t_end=2.5, fs=256):
     t_max = X.shape[2]
     start = max(round(t_start * fs), 0)
@@ -55,7 +54,6 @@ def Select_time_window(X, t_start=1, t_end=2.5, fs=256):
     return X
 
 
-# In[]
 def Filter_by_condition(X, Y, condition):
     if not condition:
         raise Exception("You have to select the conditions!")
@@ -78,8 +76,6 @@ def Filter_by_condition(X, Y, condition):
 
     return X_r, Y_r
 
-
-# In[]
 
 def Transform_for_classificator(X, Y, Classes, Conditions):
     N_grups_cnd = len(Conditions[:])
@@ -122,7 +118,6 @@ def Transform_for_classificator(X, Y, Classes, Conditions):
     return X_final, Y_final
 
 
-# In[]
 def Average_in_frec(power, frec, bands):
     N_bands = len(bands)
 
@@ -147,7 +142,6 @@ def Average_in_frec(power, frec, bands):
     return power_bands
 
 
-# In[]
 def Filter_by_class(X, Y, class_condition):
     if not class_condition:
         raise Exception("You have to select the classes for each condition!")
@@ -209,3 +203,7 @@ def Split_trial_in_time(X, Y, window_len, window_step, fs):
 
     print("Output X shape: ", X_final.shape)
     return X_final, Y_final
+
+
+
+

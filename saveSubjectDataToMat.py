@@ -1,7 +1,9 @@
 from scipy.io import savemat
 from config import Config
 from Python_Processing.Data_extractions import Extract_data_from_subject
+from Python_Processing.Utilitys import filterCondition
 import os
+
 
 # NOTES:
 #   Takes ~2 minutes to run locally (my personal laptop)
@@ -25,13 +27,7 @@ N_S = 1   # [1 to 10]
 X, Y = Extract_data_from_subject(root_dir, N_S, datatype)
 
 # Keep only trials for inner speech (see https://www.nature.com/articles/s41597-022-01147-2 Table 5)
-idxInnerSpeechTrials = (Y[:, Config.conditionColumn] == Config.idInnerCondition)
-# Keep only essential columns
-columnsToKeep = [Config.classColumn, Config.sessionColumn]
-
-X = X[idxInnerSpeechTrials]
-Y = Y[idxInnerSpeechTrials]
-Y = Y[:, columnsToKeep]
+X, Y = filterCondition(X, Y, Config.idInnerCondition)
 
 # Load baseline data
 datatype = "baseline"

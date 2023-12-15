@@ -6,6 +6,7 @@
 
 Utilitys for Inner speech dataset prossesing
 """
+from config import Config
 
 
 def Ensure_dir(dir_name):
@@ -141,3 +142,19 @@ def getFullNameFromSbjNumber(sbjNumber):
     else:
         sbjName = 'sub-'+str(sbjNumber)
     return sbjName
+
+
+def filterCondition(X, Y, conditionID, discardNonEssentialCols=True):
+    # Keep only trials for given condition
+    idxInnerSpeechTrials = (Y[:, Config.conditionColumn] == conditionID)
+
+    X = X[idxInnerSpeechTrials]
+    Y = Y[idxInnerSpeechTrials]
+
+    if discardNonEssentialCols:
+        # Keep only essential columns
+        columnsToKeep = [Config.classColumn, Config.sessionColumn]  # Class and Session# columns
+        Y = Y[:, columnsToKeep]
+
+    return X, Y
+
