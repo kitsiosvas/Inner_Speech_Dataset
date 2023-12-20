@@ -75,14 +75,20 @@ for i_sensor=65:128, subplot(8,8,i_sensor-64)
 surf(time,Faxis,squeeze(DAA(:,:,i_sensor)),'edgecolor','none');title(sensor_names2(i_sensor)) 
 xline([1,3.5],'white','linewidth',1),xlabel('sec'),ylabel('Hz'),clim([-limit,limit]),axis tight; view(0,90); end,colormap redgreencmap
 
-%% Step5  
+%% Step5 identifying the most "energetic" sensors 
 figure(5),clf
 Sensor_Score=mean(squeeze(var(DAA(:,tstart+32:tend,:),[],2))); % a small offset in time 
 %Sensor_Score=squeeze((mean(mean(abs(DAA(:,tstart:tend,:)),1),2)));
 subplot(2,1,1),stem(Sensor_Score),xlabel('sensor #'),ylabel('Activation-score')
 %threshold=quantile(Sensor_Score,.78);selected_sensor=find(Sensor_Score>threshold)
-[~,list]=sort(Sensor_Score,'descend');slist=list(1:35)
+[~,list]=sort(Sensor_Score,'descend');slist=list(1:35) % 35 most energetic sensor --> a design- parameter
 subplot(2,1,2), plot(xyz(:,1),xyz(:,2),'ko',xyz(slist,1),xyz(slist,2),'r*')
+
+%% an attempt to visualize per sensor the most energetic frequencies
+figure(6),clf
+imagesc(squeeze(mean(abs(DAA(:,tstart:tend,:)),2))')
+%imagesc(squeeze(var(DAA(:,tstart:tend,:),[],2))')
+q=xticks,xticklabels(round(Faxis(q))),xlabel('Hz'),ylabel('sensor#')
 
 
 

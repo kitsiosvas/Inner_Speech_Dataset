@@ -21,19 +21,30 @@ tpre=knnsearch(time',0.5); tstart=knnsearch(time',1);tend=knnsearch(time',3.5);
 fb = cwtfilterbank('SignalLength',Ntime,'SamplingFrequency',Fs,'FrequencyLimits',[4 40],'VoicesPerOctave',30);
 
 %% Step2  : Estimating  single-trial (time-varying) CWT-transform & computing averaged Scalograms profiles
-DiscrMAPS=[]; for i_sensor=1:Nsensors, i_sensor/Nsensors
+DiscrMAPS=[]; 
+for i_sensor=1:Nsensors
+    i_sensor/Nsensors
+    WT=[];
+    for i_trial=1:Ntrials
+        signal = STs(i_sensor,:,i_trial);
+        [wt,Faxis,coi]  = cwt(signal,'FilterBank',fb); % 100x1153 wavelet tranform of given trial
+        WT(:,:,i_trial) = abs(wt); % Get absolute value since its imaginary number
+    end
 
-WT=[];for i_trial=1:Ntrials,
-     signal=STs(i_sensor,:,i_trial); [wt,Faxis,coi]=cwt(signal,'FilterBank',fb);  % knnsearch(Faxis,35)   knnsearch(Faxis,5)
-      WT(:,:,i_trial)=abs(wt);end,
-
-sensorDiscrMaps=[];pair_no=0;for i1=1:3; for i2=i1+1:4; pair_no=pair_no+1;
-AAA1=WT(:,:,class_labels==i1); AA1=reshape(AAA1,[numel(Faxis)*Ntime,size(AAA1,3)])';         
-AAA2=WT(:,:,class_labels==i2); AA2=reshape(AAA2,[numel(Faxis)*Ntime,size(AAA2,3)])';
-paired_labels= [class_labels(class_labels==i1);class_labels(class_labels==i2)];
-[~, Z] = rankfeatures([AA1;AA2]',paired_labels,'criterion','ttest');
-sensorDiscrMaps(:,:,pair_no)=reshape(Z,numel(Faxis),Ntime);end,end
-DiscrMAPS(:,:,:,i_sensor)=sensorDiscrMaps; end 
+    sensorDiscrMaps=[];
+    pair_no=0;
+    for i1=1:3
+        for i2=i1+1:4
+            pair_no=pair_no+1;
+            AAA1=WT(:,:,class_labels==i1); AA1=reshape(AAA1,[numel(Faxis)*Ntime,size(AAA1,3)])';         
+            AAA2=WT(:,:,class_labels==i2); AA2=reshape(AAA2,[numel(Faxis)*Ntime,size(AAA2,3)])';
+            paired_labels = [class_labels(class_labels==i1); class_labels(class_labels==i2)];
+            [~, Z] = rankfeatures([AA1;AA2]',paired_labels,'criterion','ttest');
+            sensorDiscrMaps(:,:,pair_no)=reshape(Z,numel(Faxis),Ntime);
+        end
+    end
+    DiscrMAPS(:,:,:,i_sensor)=sensorDiscrMaps; 
+end 
 
 
 
@@ -44,13 +55,13 @@ ALL_DiscrMAPS=squeeze(mean(DiscrMAPS,3));     % average across pairs;
 uplimit=max(ALL_DiscrMAPS(:));lolimit=min(ALL_DiscrMAPS(:));
 figure(1),clf
 for i_sensor=1:64, subplot(8,8,i_sensor)
-surf(time,Faxis,(ALL_DiscrMAPS(:,:,i_sensor)),'edgecolor','none');title(sensor_names2(i_sensor)) 
+surf(time,Faxis,(ALL_DiscrMAPS(:,:,i_sensor)),'edgecolor','none');title(sensor_names(i_sensor)) 
 xline([1,3.5],'white','linewidth',1),xlabel('sec'),ylabel('Hz'),clim([lolimit,uplimit]),axis tight; view(0,90); end
 colormap hot
 
 figure(2),clf
 for i_sensor=65:128, subplot(8,8,i_sensor-64)
-surf(time,Faxis,(ALL_DiscrMAPS(:,:,i_sensor)),'edgecolor','none');title(sensor_names2(i_sensor)) 
+surf(time,Faxis,(ALL_DiscrMAPS(:,:,i_sensor)),'edgecolor','none');title(sensor_names(i_sensor)) 
 xline([1,3.5],'white','linewidth',1),xlabel('sec'),ylabel('Hz'),clim([lolimit,uplimit]),axis tight; view(0,90); end
 colormap hot
 
