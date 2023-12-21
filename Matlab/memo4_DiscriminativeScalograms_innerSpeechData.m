@@ -1,7 +1,7 @@
-load subject1   % Y= Y: class | session#
+load subject10   % Y= Y: class | session#
 STs=permute(X,[2,3,1]);clear X; STs_baseline=permute(baseline,[2,3,1]); clear baseline
-[Nsensors,Ntime,Ntrials]=size(STs); Fs=double(fs); time=[1:Ntime]*(1/Fs)
-class_labels=Y(:,1)+1 % Class 0-->1 "shift one" upwards
+[Nsensors,Ntime,Ntrials]=size(STs); Fs=double(fs); time=[1:Ntime]*(1/Fs);
+class_labels=Y(:,1)+1; % Class 0-->1 "shift one" upwards
 session_labels=Y(:,2); clear Y
 load sensor_xyz
 
@@ -39,11 +39,11 @@ for i_sensor=1:Nsensors
             AAA1=WT(:,:,class_labels==i1); AA1=reshape(AAA1,[numel(Faxis)*Ntime,size(AAA1,3)])';         
             AAA2=WT(:,:,class_labels==i2); AA2=reshape(AAA2,[numel(Faxis)*Ntime,size(AAA2,3)])';
             paired_labels = [class_labels(class_labels==i1); class_labels(class_labels==i2)];
-            [~, Z] = rankfeatures([AA1;AA2]',paired_labels,'criterion','ttest');
+            [~, Z] = rankfeatures([AA1;AA2]', paired_labels, 'criterion', 'ttest');
             sensorDiscrMaps(:,:,pair_no)=reshape(Z,numel(Faxis),Ntime);
         end
     end
-    DiscrMAPS(:,:,:,i_sensor)=sensorDiscrMaps; 
+    DiscrMAPS(:,:,:,i_sensor)=sensorDiscrMaps;
 end 
 
 
@@ -71,8 +71,9 @@ colormap hot
 figure(3),clf
 Sensor_Score=[];for i_sensor=1:Nsensors,Sensor_Score(i_sensor)=mean(mean(ALL_DiscrMAPS(:,tstart:tend,i_sensor)));end
 subplot(2,1,1),stem(Sensor_Score),xlabel('sensor #'),ylabel('Activation-score')
+title("Average Discrimination Score")
 %threshold=quantile(Sensor_Score,.78);selected_sensor=find(Sensor_Score>threshold)
-[~,list]=sort(Sensor_Score,'descend');slist=list(1:15) % 25 most discriminative sensors --> a design- parameter
+[~,list]=sort(Sensor_Score,'descend');slist=list(1:35) % 25 most discriminative sensors --> a design- parameter
 subplot(2,1,2), plot(xyz(:,1),xyz(:,2),'ko'),hold on,plot(xyz(slist,1),xyz(slist,2),'r.','markersize',15)
 
 %b. emphasizing the highest values within the action-interval 
@@ -80,8 +81,9 @@ figure(4),clf
 Sensor_Score=[];for i_sensor=1:Nsensors,Q=ALL_DiscrMAPS(:,tstart:tend,i_sensor);
                     Sensor_Score(i_sensor)=quantile(Q(:),0.95);end
 subplot(2,1,1),stem(Sensor_Score),xlabel('sensor #'),ylabel('Activation-score')
+title("Top 5% Quantile")
 %threshold=quantile(Sensor_Score,.78);selected_sensor=find(Sensor_Score>threshold)
-[~,list]=sort(Sensor_Score,'descend');slist2=list(1:25) % 25 most discriminative sensors  --> a design- parameter
+[~,list]=sort(Sensor_Score,'descend');slist2=list(1:35) % 25 most discriminative sensors  --> a design- parameter
 subplot(2,1,2), plot(xyz(:,1),xyz(:,2),'ko'),hold on,plot(xyz(slist2,1),xyz(slist2,2),'r.','markersize',15)
 
 

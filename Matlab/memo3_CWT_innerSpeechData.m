@@ -25,45 +25,70 @@ sensorSCAL=[];
 for i_sensor=1:Nsensors
     i_sensor/Nsensors
 
+    % Calculate the wavelet transform (100x1153) of the i-th sensor across ALL trials
+    % single trial: 1x1153 --> wavelet transform: 100x1153 --> for all trials: 100x1153x200
     WT=[];
     for i_trial=1:Ntrials
         signal = STs(i_sensor,:,i_trial); 
         [wt, Faxis, coi] = cwt(signal,'FilterBank',fb);
         WT(:,:,i_trial) = wt;
     end
-     SCAL1 = mean(abs(WT(:,:,class_labels==1)), 3);
-     SCAL2 = mean(abs(WT(:,:,class_labels==2)), 3);
-     SCAL3 = mean(abs(WT(:,:,class_labels==3)), 3);
-     SCAL4 = mean(abs(WT(:,:,class_labels==4)), 3);
-     sensorSCAL(:,:,i_sensor, 1) = SCAL1;
-     sensorSCAL(:,:,i_sensor, 2) = SCAL2;
-     sensorSCAL(:,:,i_sensor, 3) = SCAL3;
-     sensorSCAL(:,:,i_sensor, 4) = SCAL4;
+    % Get the average for each class: 100x1153x200 --> 100x1153 4 times (one per class)
+    SCAL1 = mean(abs(WT(:,:,class_labels==1)), 3);
+    SCAL2 = mean(abs(WT(:,:,class_labels==2)), 3);
+    SCAL3 = mean(abs(WT(:,:,class_labels==3)), 3);
+    SCAL4 = mean(abs(WT(:,:,class_labels==4)), 3);
+    % Save the 4 scalograms to sensorSCAL variable for each sensor: 100x1153x128x4
+    sensorSCAL(:,:,i_sensor, 1) = SCAL1;  
+    sensorSCAL(:,:,i_sensor, 2) = SCAL2;
+    sensorSCAL(:,:,i_sensor, 3) = SCAL3;
+    sensorSCAL(:,:,i_sensor, 4) = SCAL4;
 end   
 
 %% Step3 Presenting ta averaged scalograms per sensor  (all 4 classes taken together) 
 
+% Get the mean of all classes (we calculate for each class indepedently first in case we want to
+%                              check each one later).
 ALL_sensorSCAL=mean(sensorSCAL,4);
+% Find upper and lower limits for color scaling in the plots
 uplimit = max(ALL_sensorSCAL(:));
 lolimit = min(ALL_sensorSCAL(:));
+
 figure(1),clf
-for i_sensor=1:64, subplot(8,8,i_sensor)
-surf(time,Faxis,squeeze(ALL_sensorSCAL(:,:,i_sensor)),'edgecolor','none');title(sensor_names2(i_sensor)) 
-xline([1,3.5],'white','linewidth',1),xlabel('sec'),ylabel('Hz'),clim([lolimit,uplimit]),axis tight; view(0,90); end
+for i_sensor=1:64
+    subplot(8,8,i_sensor)
+    surf(time, Faxis, squeeze(ALL_sensorSCAL(:,:,i_sensor)), EdgeColor="none");
+    title(sensor_names(i_sensor)) 
+    xline([1, 3.5], Color='white', LineWidth=1)
+    xlabel('sec')
+    ylabel('Hz')
+    clim([lolimit, uplimit])
+    axis tight;
+    view(0, 90);
+end
 
 figure(2),clf
-for i_sensor=65:128, subplot(8,8,i_sensor-64)
-surf(time,Faxis,squeeze(ALL_sensorSCAL(:,:,i_sensor)),'edgecolor','none');title(sensor_names2(i_sensor)) 
-xline([1,3.5],'white','linewidth',1),xlabel('sec'),ylabel('Hz'),clim([lolimit,uplimit]),axis tight; view(0,90); end
+for i_sensor=65:128
+    subplot(8,8,i_sensor-64)
+    surf(time, Faxis, squeeze(ALL_sensorSCAL(:,:,i_sensor)),EdgeColor='none');
+    title(sensor_names(i_sensor)) 
+    xline([1, 3.5], Color="white", LineWidth=1)
+    xlabel('sec')
+    ylabel('Hz')
+    clim([lolimit, uplimit])
+    axis tight; 
+    view(0,90);
+end
 
 
 %% Step4 presenting the Relative Change with respect to [0 0.5]sec period 
    % based on the previous averaged scalograms per sensor  (all 4 classes taken together) 
 
-% difference from baseline [0 0.5]sec
-%DAA=ALL_sensorSCAL-(mean(ALL_sensorSCAL(:,1:tpre,:),2)); limit=max(abs(DAA(:)));
-%DAA=(ALL_sensorSCAL-(mean(ALL_sensorSCAL(:,1:tpre,:),2)))./(std(ALL_sensorSCAL(:,1:tpre,:),[],2)); limit=5 %limit=max(abs(DAA(:)));
-DAA=(ALL_sensorSCAL-(mean(ALL_sensorSCAL(:,1:tpre,:),2)))./(mean(ALL_sensorSCAL(:,1:tpre,:),2));  limit=max(abs(DAA(:)));
+
+% Get the mean scalogram of the [0 0.5] period for each sensor [100x1x128] and subtract it from all
+% scalograms [100x1153x128]. Then divide element wise by the same amount for normalization.
+DAA   = (ALL_sensorSCAL-(mean(ALL_sensorSCAL(:,1:tpre,:),2)))./(mean(ALL_sensorSCAL(:,1:tpre,:),2));
+limit = max(abs(DAA(:)));
 
 figure(3),clf
 for i_sensor=1:64, subplot(8,8,i_sensor)
