@@ -38,13 +38,13 @@ for iSubject in Config.subjectsList:
 
     normalizeData = True
     if normalizeData:
-        scaler  = StandardScaler()
-        X = scaler.fit_transform(X)
+        scaler = StandardScaler()
+        X      = scaler.fit_transform(X)
 
     applyPCA = False
     if applyPCA:
-        pca     = PCA(n_components=30)
-        X = pca.fit_transform(X)
+        pca = PCA(n_components=30)
+        X   = pca.fit_transform(X)
 
     modelType = "xgb"
     if modelType == "rf":

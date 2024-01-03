@@ -38,12 +38,12 @@ X = psds.reshape(psds.shape[0], -1)  # Flatten data into 2D
 normalizeData = True
 if normalizeData:
     scaler = StandardScaler()
-    X = scaler.fit_transform(X)
+    X      = scaler.fit_transform(X)
 
 applyPCA = False
 if applyPCA:
-    pca     = PCA(n_components=30)
-    X = pca.fit_transform(X)
+    pca = PCA(n_components=30)
+    X   = pca.fit_transform(X)
 
 modelType = "xgb"
 if modelType == "rf":
