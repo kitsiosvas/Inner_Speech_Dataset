@@ -1,5 +1,5 @@
 sensorScores = [];
-
+topPicks = [];
 for iSubject=1:10
     filename = sprintf("subject%d", iSubject);
     load(filename)
@@ -45,7 +45,7 @@ for iSubject=1:10
                 AAA1=WT(:,:,class_labels==i1); AA1=reshape(AAA1,[numel(Faxis)*Ntime,size(AAA1,3)])';         
                 AAA2=WT(:,:,class_labels==i2); AA2=reshape(AAA2,[numel(Faxis)*Ntime,size(AAA2,3)])';
                 paired_labels = [class_labels(class_labels==i1); class_labels(class_labels==i2)];
-                [~, Z] = rankfeatures([AA1;AA2]', paired_labels, 'criterion', 'ttest');
+                [~, Z] = rankfeatures([AA1;AA2]', paired_labels, 'criterion', 'wilcoxon');
                 sensorDiscrMaps(:,:,pair_no)=reshape(Z,numel(Faxis),Ntime);
             end
         end
@@ -65,6 +65,10 @@ for iSubject=1:10
     end
 
     sensorScores(:, iSubject) = thisSubjectSensorScore;
+
+    % Keep top 35 sensors for each subject
+    [~,list] = sort(thisSubjectSensorScore,'descend');
+    topPicks(:, iSubject) = list(1:35);
 
     
 end
