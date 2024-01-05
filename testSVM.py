@@ -53,38 +53,34 @@ elif modelType == "svm":
     model = SVC(kernel='poly', degree=4)
 
 elif modelType == "xgb":
-    #model = xgb.XGBClassifier()
-    dtrain = xgb.DMatrix(X, label=y)
-    kfold = StratifiedKFold(n_splits=4, shuffle=True, random_state=42)
-
-    # Set XGBoost parameters
-    # Assuming you have your DMatrix 'dmatrix' and other parameters
-    params = {
-        'objective': 'multi:softmax',  # Use softmax for multi-class classification
-        'num_class': 4,  # Specify the number of classes
-        'eval_metric': 'merror',  # Evaluation metric for classification error
-        'max_depth': 3,
-        'learning_rate': 0.1,
-        'subsample': 0.8,
-        'colsample_bytree': 0.8
-    }
-
-    cv = xgb.cv(
-        params,
-        dtrain,
-        num_boost_round=1000,  # number of boosting rounds
-        nfold=4,
-        metrics='merror',    # evaluation metric
-        early_stopping_rounds=10,  # stop if performance hasn't improved in 10 rounds
-        stratified=True,
-        seed=42
-    )
-    print(cv.iloc[0])
-    exit(1)
+    model = xgb.XGBClassifier()
+    # dtrain = xgb.DMatrix(X, label=y)
+    #
+    # # Set XGBoost parameters
+    # params = {
+    #     'objective': 'multi:softmax',
+    #     'num_class': 4,
+    #     'eval_metric': 'merror',  # Evaluation metric for classification error
+    #     'max_depth': 3,
+    #     'learning_rate': 0.1,
+    #     'subsample': 0.8,
+    #     'colsample_bytree': 0.8
+    # }
+    #
+    # cv = xgb.cv(
+    #     params,
+    #     dtrain,
+    #     num_boost_round=1000,  # number of boosting rounds
+    #     nfold=4,
+    #     early_stopping_rounds=10,  # stop if performance hasn't improved in 10 rounds
+    #     stratified=True,
+    # )
+    # print(cv.iloc[0])
+    # exit(1)
 
 
 # Perform K-fold cross-validation
-cv = StratifiedKFold(n_splits=10, shuffle=True, random_state=42)
+cv = StratifiedKFold(n_splits=4, shuffle=True, random_state=0)
 scores = cross_val_score(model, X, y, cv=cv, scoring='accuracy')
 
 # Print the cross-validation scores
