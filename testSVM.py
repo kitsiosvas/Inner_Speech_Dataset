@@ -32,7 +32,7 @@ X = selectElectrodes(X, electrodes)
 X = Select_time_window(X)  # Keep only action interval
 y = Y[:, 1]
 
-psds, freqs = psd_array_welch(X, 256, fmin=8, fmax=40, verbose=False)
+psds, freqs = psd_array_welch(X, 256, fmin=8, fmax=100, verbose=False)
 X = psds.reshape(psds.shape[0], -1)  # Flatten data into 2D
 
 normalizeData = True
