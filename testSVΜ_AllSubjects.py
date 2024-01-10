@@ -13,7 +13,6 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 from sklearn.model_selection import cross_val_score, StratifiedKFold
 
-
 import xgboost as xgb
 
 # Data Type {eeg, exg, baseline}
@@ -50,7 +49,7 @@ for iSubject in Config.subjectsList:
         model = RandomForestClassifier(n_estimators=100, random_state=42)
 
     elif modelType == "svm":
-        model = SVC(kernel='poly', degree=2)
+        model = SVC()
 
     elif modelType == "xgb":
         model = xgb.XGBClassifier()
