@@ -145,6 +145,9 @@ def getFullNameFromSbjNumber(sbjNumber):
 
 
 def filterCondition(X, Y, conditionID, discardNonEssentialCols=True):
+    # If discardNonEssentialCols is set to True, it will only return the Class and Session# columns and discard the other 2
+    # This is needed in saveSubjectDataToMat.py because we need only those two columns.
+
     # Keep only trials for given condition
     idxInnerSpeechTrials = (Y[:, Config.conditionColumn] == conditionID)
 
@@ -153,7 +156,7 @@ def filterCondition(X, Y, conditionID, discardNonEssentialCols=True):
 
     if discardNonEssentialCols:
         # Keep only essential columns
-        columnsToKeep = [Config.classColumn, Config.sessionColumn]  # Class and Session# columns
+        columnsToKeep = [Config.classColumn, Config.sessionColumn]
         Y = Y[:, columnsToKeep]
 
     return X, Y
