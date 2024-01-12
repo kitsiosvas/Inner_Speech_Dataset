@@ -12,6 +12,7 @@ import gc
 import numpy as np
 from Python_Processing.Utilitys import getFullNameFromSbjNumber, unify_names
 import pickle
+import mne
 
 
 def Extract_subject_from_BDF(root_dir, sbjNumber, sessionNumber):
@@ -24,9 +25,10 @@ def Extract_subject_from_BDF(root_dir, sbjNumber, sessionNumber):
     return rawdata, Num_s
 
 
-def Extract_data_from_subject(root_dir, sbjNumber, datatype):
+def Extract_data_from_subject(root_dir, sbjNumber, datatype, keepEpochs=False):
     """
     Load all blocks for one subject and stack the results in X
+    If keepEpochs is true, return the epoched object and not only the data vector
     """
 
     # name correction if sbjNumber is less than 10
@@ -42,14 +44,21 @@ def Extract_data_from_subject(root_dir, sbjNumber, datatype):
         y[thisSession] = load_events(root_dir, sbjNumber, thisSession)
         file_name = root_dir + '/derivatives/' + sbjName + '/ses-0' + str(thisSession) + '/' + sbjName + '_ses-0' + str(thisSession) + fileSuffix
         X = mne.read_epochs(file_name, verbose='WARNING')
-        data[thisSession] = X.get_data(copy=True)
+        if keepEpochs:
+            data[thisSession] = X
+        else:
+            data[thisSession] = X.get_data(copy=True)
+
         if datatype == "baseline":
             # NOTE: When loading baseline .fif file, it returns an (1, 137, 3841) array instead of
             #       (1, 136, 3841) as mentioned in the paper (136 = 128+8). The last row seems to be
             #       an error in the .fif file. We discard it. Also discard EXG data (last 8 rows)
             data[thisSession] = data[thisSession][:, :-9, :]
 
-    X = np.vstack((data.get(1), data.get(2), data.get(3)))
+    if keepEpochs:
+        X = mne.concatenate_epochs([data.get(1), data.get(2), data.get(3)])
+    else:
+        X = np.vstack((data.get(1), data.get(2), data.get(3)))
     Y = np.vstack((y.get(1), y.get(2), y.get(3)))
 
     return X, Y
