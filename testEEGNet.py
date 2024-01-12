@@ -55,8 +55,7 @@ if normalizeData:
     X_train = X_train_scaled.reshape(X_train.shape)
     X_test = X_test_scaled.reshape(X_test.shape)
 
-# Convert data to NHWC (trials, channels, samples, kernels) format. Data
-# contains 60 channels and 151 time-points. Set the number of kernels to 1.
+# Convert data to NHWC (trials, channels, samples, kernels) format. Set the number of kernels to 1.
 X_train = X_train.reshape(X_train.shape[0], X_train.shape[1], X_train.shape[2], 1)
 X_test  = X_test.reshape(X_test.shape[0], X_test.shape[1], X_test.shape[2], 1)
 y_train = to_categorical(y_train)
