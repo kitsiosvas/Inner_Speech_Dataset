@@ -2,17 +2,21 @@ from config import Config
 from Python_Processing.Data_extractions import Extract_data_from_subject, Extract_block_data_from_subject
 from Python_Processing.Utilitys import filterCondition, selectElectrodes
 from Python_Processing.Data_processing import Select_time_window
-
 import numpy as np
 from mne.time_frequency import psd_array_welch
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
 from EEGNet.EEGModels import EEGNet
 from tensorflow import keras
 from keras.callbacks import ModelCheckpoint
 from keras.utils import to_categorical
+
+
+"""
+    Training of the EEGNet networked described in 
+    https://iopscience.iop.org/article/10.1088/1741-2552/aace8c
+"""
 
 # Data Type {eeg, exg, baseline}
 datatype = "eeg"

@@ -2,7 +2,6 @@ from config import Config
 from Python_Processing.Data_extractions import Extract_data_from_subject, Extract_block_data_from_subject
 from Python_Processing.Utilitys import filterCondition, selectElectrodes
 from Python_Processing.Data_processing import Select_time_window
-
 import numpy as np
 from mne.time_frequency import psd_array_welch
 from sklearn.decomposition import PCA
@@ -11,7 +10,6 @@ from keras.models import Sequential
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
-
 from keras.layers import Bidirectional, LSTM, Dense, Dropout
 from keras.optimizers import SGD, Adam
 
