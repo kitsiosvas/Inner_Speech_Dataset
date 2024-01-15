@@ -28,6 +28,14 @@ class Config:
     conditionColumn = 2
     sessionColumn   = 3
 
+    # Mapping of numerical labels to corresponding names
+    labelToName = {
+        0: 'up',
+        1: 'down',
+        2: 'right',
+        3: 'left'
+    }
+
     @staticmethod
     def getFileSuffixFromShort(datatype):
         if datatype == "eeg":
