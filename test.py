@@ -1,5 +1,5 @@
 from config import Config
-from Python_Processing.Data_extractions import Extract_data_from_subject, Extract_block_data_from_subject, Extract_report
+from Python_Processing.Data_extractions import Extract_data_from_subject
 
 
 # Hyper parameters
