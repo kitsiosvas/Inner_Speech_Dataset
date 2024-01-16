@@ -44,6 +44,7 @@ X = np.array([filtfilt(b, a, trial, axis=1) for trial in X])
 cv = KFold(n_splits=10, shuffle=True, random_state=42)
 
 
+# For type of covariance matrices estimators seeL https://pyriemann.readthedocs.io/en/latest/generated/pyriemann.utils.covariance.covariances.html#pyriemann.utils.covariance.covariances
 clf = make_pipeline(
     XdawnCovariances(),
     TangentSpace(metric="riemann"),
