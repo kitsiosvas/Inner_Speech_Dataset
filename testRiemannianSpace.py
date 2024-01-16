@@ -62,7 +62,7 @@ for train_idx, test_idx in cv.split(X):
 acc = np.mean(preds == y)
 print("Classification accuracy: %f " % (acc))
 
-names = ["audio left", "audio right", "vis left", "vis right"]
+names = ["up", "down", "right", "left"]
 cm = confusion_matrix(y, preds)
 ConfusionMatrixDisplay(cm, display_labels=names).plot()
 plt.show()
