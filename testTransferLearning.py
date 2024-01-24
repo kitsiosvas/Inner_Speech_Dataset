@@ -56,7 +56,7 @@ if normalizeData:
     X = X_scaled.reshape(X.shape)
 
 c = Covariances(estimator='lwf')
-X_org = c.fit_transform(X)
+X_org = c.fit_transform(X)  # (samples, 28, 28) cov matrices (28 = #electrodes)
 
 # Fix seed for reproducible results
 seed = 66
@@ -69,17 +69,17 @@ embedded_points = {}
 
 # embed the source and target datasets after recentering
 rct = TLCenter(target_domain='session1')
-X_rct = rct.fit_transform(X_org, y_enc)
+X_rct = rct.fit_transform(X_org, y_enc)  # (samples, 28, 28) cov matrices after recentering
 
 stretch = TLStretch(target_domain='session1', centered_data=True)
-X_stretched = stretch.fit_transform(X_rct, y_enc)
+X_stretched = stretch.fit_transform(X_rct, y_enc)  # (samples, 28, 28) cov matrices after stretching
 
 # embed the source and target datasets after rotating
 rot = TLRotate(target_domain='session1', metric='riemann')
-X_rot = rot.fit_transform(X_stretched, y_enc)
+X_rot = rot.fit_transform(X_stretched, y_enc)  # (samples, 28, 28) cov matrices after rotating
 
 points = np.concatenate([X_org, X_rct, X_stretched, X_rot, np.eye(numOfChannels)[None, :, :]])
-S = emb.fit_transform(points)
+S = emb.fit_transform(points)  # (4*samples+1, 2) coordinates in embedded space
 #S = S - S[-1]
 embedded_points['origin'] = S[:numOfTrials]
 embedded_points['rct'] = S[numOfTrials:2*numOfTrials]
