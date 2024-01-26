@@ -7,6 +7,7 @@
 Utilitys for Inner speech dataset prossesing
 """
 from config import Config
+from numpy import isin
 
 
 def Ensure_dir(dir_name):
@@ -155,7 +156,10 @@ def filterCondition(X, Y, conditionID, sessionNum=None, discardNonEssentialCols=
     Y = Y[idxInnerSpeechTrials]
 
     if sessionNum is not None:
-        idxSessionTrials = (Y[:, Config.sessionColumn] == sessionNum)
+        if isinstance(sessionNum, int):
+            sessionNum = [sessionNum]  # Convert single session number to a list
+
+        idxSessionTrials = isin(Y[:, Config.sessionColumn], sessionNum)
         X = X[idxSessionTrials]
         Y = Y[idxSessionTrials]
 
