@@ -18,7 +18,6 @@ from pyriemann.estimation import Covariances
 from sklearn import manifold
 
 
-
 datatype = "eeg"  # Data Type {eeg, exg, baseline}
 N_S = 1           # Subject number [1 to 10]
 fs  = 256         # Sampling freq
@@ -29,8 +28,17 @@ X, Y = Extract_data_from_subject(Config.datasetDir, N_S, datatype)
 sessionsToKeep = [1, 3]
 X, Y = filterCondition(X, Y, Config.idInnerCondition, sessionsToKeep, discardNonEssentialCols=False)
 
+# filter here data if we want to test it on binary
+binaryProblem = True
+if binaryProblem:
+    labelsToKeep = [0, 1]  # 0:up, 1:down, 2:right, 3:left
+    idxToKeep = np.isin(Y[:, Config.classColumn], labelsToKeep)
+    X = X[idxToKeep]
+    Y = Y[idxToKeep]
+
+
 electrodes = ["D5", "D6", "D7", "D8"]
-#electrodes = ["D5", "D6", "D7", "D8", "D9", "D10", "D11", "D12", "D13", "D14", "D15", "D16", "D17", "D18", "D19", "D20", "D21", "D22", "D23", "D24", "D25", "D26", "D27", "D28", "D29", "D30", "D31", "D32"]
+electrodes = ["D5", "D6", "D7", "D8", "D9", "D10", "D11", "D12", "D13", "D14", "D15", "D16", "D17", "D18", "D19", "D20", "D21", "D22", "D23", "D24", "D25", "D26", "D27", "D28", "D29", "D30", "D31", "D32"]
 # electrodes = ["A5","A6","A7","A8","A9","A10","A11","A14","A16","A17","A18","A19","A21","A24","A25","A28","A29","B3","B5","B6","B7","B8","B9","B10","B11","B12","B13","B16","B21","B26","C10","C13","C15","C16","C18","C28","C29","D5","D17","D18","D19","D20","D25","D27","D28","D29","D30"]
 X = selectElectrodes(X, electrodes)
 X = Select_time_window(X)
@@ -78,7 +86,7 @@ startingMatrices['rot'] = rot.fit_transform(startingMatrices['stretched'], y_enc
 
 covMatricesAll = np.concatenate([startingMatrices['origin'], startingMatrices['rct'], startingMatrices['stretched'], startingMatrices['rot'], np.eye(numOfChannels)[None, :, :]])
 
-spectralEmbedding = True
+spectralEmbedding = False
 if spectralEmbedding:
     # Embedding in 2D space
     emb = SpectralEmbedding(n_components=2, metric='riemann')
@@ -125,23 +133,28 @@ for axi, step, title in zip(ax, steps, titles):
 
     for session in np.unique(domain):  # For all sessions
         thisSessionData = data_all[domain == session]
-        y_session = y[domain == session]
+        thisSessionLabels = y[domain == session]
 
         for cls in np.unique(y):
-            mask = y_session == cls
+            mask = thisSessionLabels == cls
             axi.scatter(
                 thisSessionData[mask, 0],
                 thisSessionData[mask, 1],
                 c=f'C{cls}', marker=markers[session-1], s=50, alpha=0.50,
                 label=f'Session {session} - Class {cls}'
             )
+    # Put text for single class
+    classToPlotTxt = np.unique(y)[0]
+    for i in range(len(data_all)):
+        if y[i]==classToPlotTxt:
+            axi.text(data_all[i, 0], data_all[i, 1], str(i+1), fontsize=8, ha='center', va='center', color='black')
+
 
     #axi.set_aspect('equal')
     axi.set_title(title, fontsize=14)
     axi.axis('tight')
 
 ax[0].legend(loc="upper right")
-plt.show()
 if spectralEmbedding:
     fig.suptitle('Spectral Embedding visualization', fontsize=16)
 else:
