@@ -41,8 +41,8 @@ if normalizeData:
     X          = X_scaled.reshape(X.shape)
 
 # Define bandpass filter parameters
-lowcut = 13
-highcut = 30
+lowcut = 8
+highcut = 40
 nyquist = 0.5 * fs
 low = lowcut / nyquist
 high = highcut / nyquist
@@ -51,7 +51,7 @@ b, a = butter(4, [low, high], btype='band', output='ba')
 X = np.array([filtfilt(b, a, trial, axis=1) for trial in X])
 
 
-plot = True
+plot = False
 if plot:
     # Calculate Covariance Matrices
     cov_est = Covariances()
@@ -94,9 +94,7 @@ if plot:
     plt.legend()
     plt.show()
 
-
-
-runClassification = False
+runClassification = True
 if runClassification:
     cv = KFold(n_splits=10, shuffle=True, random_state=42)
 

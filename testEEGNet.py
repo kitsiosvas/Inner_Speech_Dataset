@@ -74,7 +74,7 @@ model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accur
 checkpointer = ModelCheckpoint(filepath='/tmp/checkpoint.h5', verbose=1,
                                save_best_only=True)
 
-fittedModel = model.fit(X_train, y_train, batch_size=16, epochs=300, validation_split=0.25, verbose=2, callbacks=[checkpointer])
+fittedModel = model.fit(X_train, y_train, batch_size=16, epochs=30, validation_split=0.25, verbose=2, callbacks=[checkpointer])
 model.load_weights('/tmp/checkpoint.h5')
 
 
@@ -82,3 +82,49 @@ probs       = model.predict(X_test)
 preds       = probs.argmax(axis=-1)
 acc         = np.mean(preds == y_test.argmax(axis=-1))
 print(f"Classification accuracy: {acc}")
+
+
+
+
+
+
+
+
+
+import matplotlib.pyplot as plt
+
+# Access the training history from fittedModel
+history = fittedModel.history
+
+# Plot training and validation accuracy
+plt.figure(figsize=(12, 4))
+
+plt.subplot(1, 2, 1)
+plt.plot(history['accuracy'], label='Training Accuracy')
+plt.plot(history['val_accuracy'], label='Validation Accuracy')
+plt.title('Training and Validation Accuracy')
+plt.xlabel('Epochs')
+plt.ylabel('Accuracy')
+plt.legend()
+
+# Plot training and validation loss
+plt.subplot(1, 2, 2)
+plt.plot(history['loss'], label='Training Loss')
+plt.plot(history['val_loss'], label='Validation Loss')
+plt.title('Training and Validation Loss')
+plt.xlabel('Epochs')
+plt.ylabel('Loss')
+plt.legend()
+
+plt.tight_layout()
+plt.show()
+
+
+
+
+
+
+
+
+
+
