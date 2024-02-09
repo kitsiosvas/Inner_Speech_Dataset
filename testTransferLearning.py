@@ -70,19 +70,21 @@ seed = 2024
 
 startingMatrices = {}
 embedded_points = {}  # Embedded points will either be spectral embedding or MDS result
-targetDomain = 'session1'
+targetDomain = 'session3'
 
 c = Covariances(estimator='lwf')
-startingMatrices['origin'] = c.fit_transform(X)
+multConstant = 1  # constant to multiply the cov matrices to avoid dealing with small numbers
+
+startingMatrices['origin'] = multConstant*c.fit_transform(X)
 
 rct = TLCenter(target_domain=targetDomain)
-startingMatrices['rct'] = rct.fit_transform(startingMatrices['origin'], y_enc)  # (samples, 28, 28) cov matrices after re-centering
+startingMatrices['rct'] = multConstant*rct.fit_transform(startingMatrices['origin'], y_enc)  # (samples, 28, 28) cov matrices after re-centering
 
 stretch = TLStretch(target_domain=targetDomain, centered_data=True)
-startingMatrices['stretched'] = stretch.fit_transform(startingMatrices['rct'], y_enc)  # (samples, 28, 28) cov matrices after stretching
+startingMatrices['stretched'] = multConstant*stretch.fit_transform(startingMatrices['rct'], y_enc)  # (samples, 28, 28) cov matrices after stretching
 
 rot = TLRotate(target_domain=targetDomain, metric='riemann')
-startingMatrices['rot'] = rot.fit_transform(startingMatrices['stretched'], y_enc)  # (samples, 28, 28) cov matrices after rotating
+startingMatrices['rot'] = multConstant*rot.fit_transform(startingMatrices['stretched'], y_enc)  # (samples, 28, 28) cov matrices after rotating
 
 covMatricesAll = np.concatenate([startingMatrices['origin'], startingMatrices['rct'], startingMatrices['stretched'], startingMatrices['rot'], np.eye(numOfChannels)[None, :, :]])
 
