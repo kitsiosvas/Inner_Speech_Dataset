@@ -36,9 +36,6 @@ electrodes = ["D5", "D6", "D7", "D8", "D9", "D10", "D11", "D12", "D13", "D14", "
 X = Select_time_window(X)  # Keep only action interval
 y = Y[:, Config.classColumn]
 
-useSpectralDomainData = False
-if useSpectralDomainData:
-    X, freqs = psd_array_welch(X, 256, fmin=8, fmax=100, verbose=False)
 
 applyPCA = False
 if applyPCA:
