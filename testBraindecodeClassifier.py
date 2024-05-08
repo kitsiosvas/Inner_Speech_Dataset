@@ -1,4 +1,3 @@
-from scipy.signal import butter, filtfilt
 from sklearn.model_selection import train_test_split
 import numpy as np
 from sklearn.preprocessing import StandardScaler
@@ -7,9 +6,7 @@ from Python_Processing.Data_extractions import Extract_data_from_subject
 from Python_Processing.Utilitys import filterCondition, selectElectrodes
 from Python_Processing.Data_processing import Select_time_window
 
-from braindecode.models.util import to_dense_prediction_model
-from braindecode.classifier import EEGClassifier
-from braindecode.datasets import create_from_X_y, BaseDataset
+from braindecode.datasets import create_from_X_y
 
 
 datatype = "eeg"  # Data Type {eeg, exg, baseline}
@@ -18,22 +15,12 @@ fs  = 256         # Sampling freq
 
 # Load all trials for a single subject
 X, Y = Extract_data_from_subject(Config.datasetDir, N_S, datatype)
+# Keep only inner speech trials (since dataset consists of inner, pronounced and imagined)
 X, Y = filterCondition(X, Y, Config.idInnerCondition, discardNonEssentialCols=False)
 
-#X = selectElectrodes(X, ["D5","D6","D7","D8","D9","D10","D11","D12","D13","D14","D15","D16","D17","D18","D19","D20","D21","D22","D23","D24","D25","D26","D27","D28","D29","D30","D31","D32"])
+X = selectElectrodes(X, ["D5","D6","D7","D8","D9","D10","D11","D12","D13","D14","D15","D16","D17","D18","D19","D20","D21","D22","D23","D24","D25","D26","D27","D28","D29","D30","D31","D32"])
 X = Select_time_window(X)
 y = Y[:, Config.classColumn]
-
-
-# Define bandpass filter parameters
-lowcut = 8
-highcut = 40
-nyquist = 0.5 * fs
-low = lowcut / nyquist
-high = highcut / nyquist
-b, a = butter(4, [low, high], btype='band')
-# Apply bandpass filter to each trial in X
-X = np.array([filtfilt(b, a, trial, axis=1) for trial in X])
 
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -57,7 +44,7 @@ val_set = create_from_X_y(X_test, y_test, drop_last_window=False, sfreq=fs)
 
 
 import torch
-from braindecode.models import ShallowFBCSPNet
+from braindecode.models import ShallowFBCSPNet, EEGConformer
 from braindecode.util import set_random_seeds
 
 
@@ -68,58 +55,54 @@ if cuda:
 seed = 20200220
 set_random_seeds(seed=seed, cuda=cuda)
 
-n_classes = 4
-classes = list(range(n_classes))
+classes = np.unique(y_train)
+n_classes = classes.size
+
 # Extract number of chans and time steps from dataset
 n_chans = X_train.shape[1]
 n_times = X_train.shape[2]
 
-model = ShallowFBCSPNet(
-    n_chans,
-    n_classes,
+model = EEGConformer(
+    n_outputs=n_classes,
+    n_chans=n_chans,
     n_times=n_times,
-    final_conv_length='auto',
+    sfreq=fs,
+    final_fc_length=1480
 )
 
-# Display torchinfo table describing the model
-print(model)
 
 # Send model to GPU
 if cuda:
     model = model.cuda()
 
-from skorch.callbacks import LRScheduler
-from braindecode import EEGClassifier
+from braindecode.classifier import EEGClassifier
 from skorch.helper import predefined_split
+from skorch.callbacks import LRScheduler
 
-# We found these values to be good for the shallow network:
-lr = 0.0625 * 0.01
-weight_decay = 0
-
-# For deep4 they should be:
-# lr = 1 * 0.01
-# weight_decay = 0.5 * 0.001
-
+# Define training parameters
+lr = 0.001  # Adjust the learning rate as needed
+weight_decay = 1e-4
 batch_size = 32
 n_epochs = 20
 
+# Define the EEGClassifier
 clf = EEGClassifier(
     model,
-    criterion=torch.nn.NLLLoss,
+    criterion=torch.nn.CrossEntropyLoss,
     optimizer=torch.optim.AdamW,
-    train_split=predefined_split(val_set),  # using valid_set for validation
+    train_split=predefined_split(val_set),  # using val_set for validation
     optimizer__lr=lr,
     optimizer__weight_decay=weight_decay,
     batch_size=batch_size,
     callbacks=[
-        "accuracy", ("lr_scheduler", LRScheduler('CosineAnnealingLR', T_max=n_epochs - 1)),
+        ("lr_scheduler", LRScheduler('CosineAnnealingLR', T_max=n_epochs - 1)),
     ],
     device=device,
-    classes=classes,
+    classes=classes
 )
 
+# Train the model
 _ = clf.fit(train_set, y=None, epochs=n_epochs)
-
 
 """
 PLOTTING RESULTS
