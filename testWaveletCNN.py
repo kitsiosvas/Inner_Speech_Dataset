@@ -9,6 +9,7 @@ from keras.callbacks import ModelCheckpoint
 from keras.utils import to_categorical
 from scipy.signal import cwt, ricker
 
+
 """
     Training of a CNN network using wavelet transform for EEG signal classification
 """
