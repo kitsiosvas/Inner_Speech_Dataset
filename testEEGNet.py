@@ -68,25 +68,16 @@ model = EEGNet(nb_classes=4, Chans=X_train.shape[1], Samples=X_train.shape[2],
 
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
-checkpointer = ModelCheckpoint(filepath='/tmp/checkpoint.h5', verbose=1,
-                               save_best_only=True)
+checkpointer = ModelCheckpoint(filepath='/tmp/checkpoint.keras', verbose=1, save_best_only=True)
 
-fittedModel = model.fit(X_train, y_train, batch_size=16, epochs=30, validation_split=0.25, verbose=2, callbacks=[checkpointer])
-model.load_weights('/tmp/checkpoint.h5')
+fittedModel = model.fit(X_train, y_train, batch_size=4, epochs=30, validation_split=0.25, verbose=2, callbacks=[checkpointer])
+model.load_weights('/tmp/checkpoint.keras')
 
 
 probs       = model.predict(X_test)
 preds       = probs.argmax(axis=-1)
 acc         = np.mean(preds == y_test.argmax(axis=-1))
 print(f"Classification accuracy: {acc}")
-
-
-
-
-
-
-
-
 
 import matplotlib.pyplot as plt
 
@@ -115,8 +106,6 @@ plt.legend()
 
 plt.tight_layout()
 plt.show()
-
-
 
 
 

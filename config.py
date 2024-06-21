@@ -6,7 +6,7 @@ class Config:
 
     # Paths can be either relative or absolute
 
-    datasetDir = "../Dataset/"
+    datasetDir = "../Dataset/" # This basically means: "Go one directory back (the '..') and look for the 'Dataset' folder"
 
     # File suffices
     fileSuffixEEG      = "_eeg-epo.fif"

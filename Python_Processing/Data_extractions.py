@@ -31,12 +31,13 @@ def Extract_data_from_subject(root_dir, sbjNumber, datatype, keepEpochs=False):
     If keepEpochs is true, return the epoched object and not only the data vector
     """
 
-    # name correction if sbjNumber is less than 10
+    # name correction if sbjNumber is less than 10 (with input the number 1, it returns the string "sbj_01" which corresponds to the name of the data file for the subject one)
     sbjName = getFullNameFromSbjNumber(sbjNumber)
     data    = dict()
     y       = dict()
     datatype = datatype.lower()
 
+    # Gets as input the string "eeg" or "exg" and returns the string "_eeg-epo.fif" etc...
     fileSuffix = Config.getFileSuffixFromShort(datatype)
 
     for thisSession in Config.sessionsList:
