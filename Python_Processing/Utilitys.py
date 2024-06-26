@@ -149,6 +149,8 @@ def filterCondition(X, Y, conditionID, sessionNum=None, discardNonEssentialCols=
     # If discardNonEssentialCols is set to True, it will only return the Class and Session# columns and discard the other 2
     # This is needed in saveSubjectDataToMat.py because we need only those two columns.
 
+    # sessionNum if specified, defined from which sessions we want to return data form. If None, then we return all 3 sessions.
+
     # Keep only trials for given condition
     idxInnerSpeechTrials = (Y[:, Config.conditionColumn] == conditionID)
 
