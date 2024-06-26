@@ -83,7 +83,7 @@ from skorch.callbacks import LRScheduler
 lr = 0.001  # Adjust the learning rate as needed
 weight_decay = 1e-4
 batch_size = 32
-n_epochs = 20
+n_epochs = 10
 
 # Define the EEGClassifier
 clf = EEGClassifier(
@@ -109,20 +109,27 @@ PLOTTING RESULTS
 """
 import matplotlib.pyplot as plt
 import pandas as pd
+import numpy as np
 from matplotlib.lines import Line2D
 
 # Extract loss and accuracy values for plotting from history object
-results_columns = ['train_loss', 'valid_loss', 'train_accuracy', 'valid_accuracy']
-df = pd.DataFrame(clf.history[:, results_columns], columns=results_columns,
-                  index=clf.history[:, 'epoch'])
+results_columns = ['train_loss', 'valid_loss', 'valid_acc']
+df = pd.DataFrame(clf.history[:, results_columns], columns=results_columns, index=clf.history[:, 'epoch'])
+
+# Convert lists to numpy arrays for arithmetic operations
+train_loss_array = np.array(clf.history[:, 'train_loss'])
+valid_acc_array = np.array(clf.history[:, 'valid_acc'])
 
 # get percent of misclass for better visual comparison to loss
-df = df.assign(train_misclass=100 - 100 * df.train_accuracy,
-               valid_misclass=100 - 100 * df.valid_accuracy)
+df = df.assign(
+    train_misclass=100 - 100 * train_loss_array,  # Assuming train_loss as a proxy for train misclassification
+    valid_misclass=100 - 100 * valid_acc_array
+)
 
 fig, ax1 = plt.subplots(figsize=(8, 3))
 df.loc[:, ['train_loss', 'valid_loss']].plot(
-    ax=ax1, style=['-', ':'], marker='o', color='tab:blue', legend=False, fontsize=14)
+    ax=ax1, style=['-', ':'], marker='o', color='tab:blue', legend=False, fontsize=14
+)
 
 ax1.tick_params(axis='y', labelcolor='tab:blue', labelsize=14)
 ax1.set_ylabel("Loss", color='tab:blue', fontsize=14)
@@ -130,7 +137,8 @@ ax1.set_ylabel("Loss", color='tab:blue', fontsize=14)
 ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
 
 df.loc[:, ['train_misclass', 'valid_misclass']].plot(
-    ax=ax2, style=['-', ':'], marker='o', color='tab:red', legend=False)
+    ax=ax2, style=['-', ':'], marker='o', color='tab:red', legend=False
+)
 ax2.tick_params(axis='y', labelcolor='tab:red', labelsize=14)
 ax2.set_ylabel("Misclassification Rate [%]", color='tab:red', fontsize=14)
 ax2.set_ylim(ax2.get_ylim()[0], 85)  # make some room for legend
@@ -147,6 +155,7 @@ plt.tight_layout()
 plt.show()
 
 plt.ioff()
+
 
 
 
